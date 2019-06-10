@@ -1,0 +1,3 @@
+[submodule "linux-hikalium"]
+	path = linux-hikalium
+	url = https://github.com/hikalium/linux-hikalium

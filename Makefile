@@ -3,13 +3,18 @@ default: initrd.img
 
 .FORCE : 
 
+bzImage : .FORCE
+	cp kernel_config_v5.1.8.txt linux-hikalium/.config
+	export CCACHE_DIR=/home/hikalium/.ccache && time make -C linux-hikalium CC="ccache gcc" -j11
+
+
 initrd.img : initrd.cpio
 	cat initrd.cpio | gzip > $@
 initrd.cpio : .FORCE
 	cd initrd_root && find ./* | cpio --quiet -H newc -o > ../$@
 	cpio -itv < $@
 
-BZIMAGE_PATH=../linux-stable/arch/x86_64/boot/bzImage
+BZIMAGE_PATH=linux-hikalium/arch/x86_64/boot/bzImage
 run : initrd.img
 	qemu-system-x86_64 \
 		-bios bios64.bin \
