@@ -19,7 +19,7 @@ run : initrd.img
 	qemu-system-x86_64 \
 		-bios bios64.bin \
 		-kernel $(BZIMAGE_PATH) \
-		-append "console=ttyS0 init=/hello" \
+		-append "console=ttyS0" \
 		-initrd initrd.img \
 		-machine q35,nvdimm -cpu qemu64 -smp 4 \
 		-monitor stdio \
@@ -28,3 +28,6 @@ run : initrd.img
 clean:
 	-rm initrd.img
 	-rm initrd.cpio
+
+telnet:
+	telnet localhost 1234
