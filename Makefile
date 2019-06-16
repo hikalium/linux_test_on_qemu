@@ -7,10 +7,13 @@ bzImage : .FORCE
 	cp kernel_config_v5.1.8.txt linux-hikalium/.config
 	export CCACHE_DIR=/home/hikalium/.ccache && time make -C linux-hikalium CC="ccache gcc" -j11
 
+ndckpt/ndckpt : .FORCE
+	make -C ndckpt ndckpt
 
 initrd.img : initrd.cpio
 	cat initrd.cpio | gzip > $@
-initrd.cpio : .FORCE
+initrd.cpio : ndckpt/ndckpt .FORCE
+	cp ndckpt/ndckpt initrd_root/bin/
 	cd initrd_root && find ./* | cpio --quiet -H newc -o > ../$@
 	cpio -itv < $@
 
