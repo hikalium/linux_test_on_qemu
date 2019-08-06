@@ -1,3 +1,7 @@
+PORT_SERIAL=1235
+PORT_MONITOR=1240
+
+VNC_PASSWORD=a
 
 default: bzImage initrd.img
 
@@ -26,21 +30,39 @@ initrd.cpio : ndckpt/ndckpt .FORCE
 	# cpio -itv < $@
 
 BZIMAGE_PATH=linux-hikalium/arch/x86_64/boot/bzImage
-run : bzImage initrd.img pmem.img
-	qemu-system-x86_64 \
-		-bios bios64.bin \
-		-kernel $(BZIMAGE_PATH) \
-		-append "console=ttyS0" \
-		-initrd initrd.img \
-		-machine q35,nvdimm -cpu qemu64 -smp 4 \
-		-monitor stdio \
-		-m 8G,slots=2,maxmem=10G \
-		-object memory-backend-file,id=mem1,share=on,mem-path=pmem.img,size=2G \
-		-device nvdimm,id=nvdimm1,memdev=mem1 \
-		-serial tcp::1234,server,nowait
+QEMU_ARGS = \
+			-bios bios64.bin \
+			-kernel $(BZIMAGE_PATH) \
+			-append "console=ttyS0 nokaslr" \
+			-initrd initrd.img \
+			-machine q35,nvdimm -cpu host --enable-kvm -smp 4 \
+			-monitor stdio \
+			-monitor telnet:127.0.0.1:$(PORT_MONITOR),server,nowait \
+			-m 8G,slots=2,maxmem=10G \
+			-object memory-backend-file,id=mem1,share=on,mem-path=pmem.img,size=2G \
+			-device nvdimm,id=nvdimm1,memdev=mem1 \
+			-serial tcp::$(PORT_SERIAL),server,nowait \
+			-vnc :0,password
+
+QEMU_ARGS_WITH_GDB = $(QEMU_ARGS) -s -S
+
+run : initrd.img pmem.img
+	( echo 'change vnc password $(VNC_PASSWORD)' | while ! nc localhost 1240 ; do sleep 1 ; done ) &
+	qemu-system-x86_64 $(QEMU_ARGS)
+
+run_gdb : initrd.img pmem.img
+	( echo 'change vnc password $(VNC_PASSWORD)' | while ! nc localhost 1240 ; do sleep 1 ; done ) &
+	qemu-system-x86_64 $(QEMU_ARGS_WITH_GDB)
+
 clean:
 	-rm initrd.img
 	-rm initrd.cpio
 
-telnet:
-	telnet localhost 1234
+gdb:
+	gdb -ex 'target remote :1234' linux-hikalium/vmlinux
+	
+serial:
+	while ! telnet localhost $(PORT_SERIAL) ; do sleep 1 ; done ;
+
+monitor:
+	telnet localhost $(PORT_MONITOR)
