@@ -7,6 +7,11 @@ default: bzImage initrd.img
 
 .FORCE : 
 
+busybox : .FORCE
+	wget https://busybox.net/downloads/busybox-1.30.1.tar.bz2
+	tar -xvf busybox-1.30.1.tar.bz2
+	cd busybox-1.30.1 && make defconfig && make CONFIG_STATIC=y install -j8
+
 bzImage : .FORCE
 	cp kernel_config_v5.1.8.txt linux-hikalium/.config
 	export CCACHE_DIR=/home/hikalium/.ccache && time make -C linux-hikalium CC="ccache gcc" -j11
@@ -24,7 +29,12 @@ ndckpt/ndckpt : .FORCE
 
 initrd.img : initrd.cpio
 	cat initrd.cpio | gzip > $@
+
 initrd.cpio : ndckpt/ndckpt .FORCE
+	mkdir -p initrd_root
+	cp -r busybox-1.30.1/_install/* initrd_root/
+	cp init initrd_root/
+	mkdir -p initrd_root/etc && cp fstab initrd_root/etc/
 	cp ndckpt/ndckpt initrd_root/bin/
 	cd initrd_root && find ./* | cpio --quiet -H newc -o > ../$@
 	# cpio -itv < $@

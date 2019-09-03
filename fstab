@@ -1,0 +1,5 @@
+#
+proc	/proc	proc	nodev,noexec,nosuid	0 0
+none	/sys	sysfs	nodev,noexec,nosuid	0 0
+none	/dev	devtmpfs	mode=0755	0 0
+none	/dev/pts	devpts	noexec,nosuid,noauto	0 0

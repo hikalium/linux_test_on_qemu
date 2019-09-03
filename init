@@ -1,0 +1,9 @@
+#!/bin/sh
+[ -d /dev ] || mkdir -m 0755 /dev
+[ -d /proc ] || mkdir -m 0755 /proc
+[ -d /sys ] || mkdir -m 0755 /sys
+echo "Mounting filesystems."
+mount -a
+mkdir /dev/pts
+mount /dev/pts
+exec /sbin/init
