@@ -49,16 +49,27 @@ QEMU_ARGS = \
 			-monitor stdio \
 			-monitor telnet:127.0.0.1:$(PORT_MONITOR),server,nowait \
 			-m 8G,slots=2,maxmem=10G \
-			-object memory-backend-file,id=mem1,share=on,mem-path=pmem.img,size=2G \
 			-device nvdimm,id=nvdimm1,memdev=mem1 \
 			-serial tcp::$(PORT_SERIAL),server,nowait \
 			-vnc :0,password
 
-QEMU_ARGS_WITH_GDB = $(QEMU_ARGS) -s -S
+QEMU_ARGS_FILE_BACKEND = \
+			$(QEMU_ARGS) \
+			-object memory-backend-file,id=mem1,share=on,mem-path=pmem.img,size=2G
+
+QEMU_ARGS_PMEM_BACKEND = \
+			$(QEMU_ARGS) \
+			-object memory-backend-file,id=mem1,share=on,mem-path=/mnt/pmem0_ext4/pmem.img,size=2G
+
+QEMU_ARGS_WITH_GDB = $(QEMU_ARGS_FILE_BACKEND) -s -S
 
 run : initrd.img pmem.img
 	( echo 'change vnc password $(VNC_PASSWORD)' | while ! nc localhost 1240 ; do sleep 1 ; done ) &
-	qemu-system-x86_64 $(QEMU_ARGS)
+	qemu-system-x86_64 $(QEMU_ARGS_FILE_BACKEND)
+
+run_pmem : initrd.img pmem.img
+	( echo 'change vnc password $(VNC_PASSWORD)' | while ! nc localhost 1240 ; do sleep 1 ; done ) &
+	qemu-system-x86_64 $(QEMU_ARGS_PMEM_BACKEND)
 
 run_gdb : initrd.img pmem.img
 	( echo 'change vnc password $(VNC_PASSWORD)' | while ! nc localhost 1240 ; do sleep 1 ; done ) &
