@@ -7,9 +7,11 @@ int main(int argc, char *argv[]) {
   pid_t fork_pid = fork();
   if(fork_pid == 0){
     puts("Hello from child");
-    puts("Sleep 3sec...");
-    sleep(3);
-    puts("Awake! Good bye!");
+    printf("  my pid is %d\n", getpid());
+    puts("  loop forever...");
+    for(;;){
+    
+    }
     return 0;
   } else if(fork_pid < 0){
     printf("Parent: Fork FAILED! retv=%d\n", fork_pid);
