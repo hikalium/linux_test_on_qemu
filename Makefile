@@ -26,16 +26,20 @@ pmem.img :
 
 ndckpt/ndckpt : .FORCE
 	make -C ndckpt ndckpt
+	
+pi/pi : .FORCE
+	make -C pi pi 
 
 initrd.img : initrd.cpio
 	cat initrd.cpio | gzip > $@
 
-initrd.cpio : ndckpt/ndckpt .FORCE
+initrd.cpio : ndckpt/ndckpt pi/pi .FORCE
 	mkdir -p initrd_root
 	cp -r busybox-1.30.1/_install/* initrd_root/
 	cp init initrd_root/
 	mkdir -p initrd_root/etc && cp fstab initrd_root/etc/
 	cp ndckpt/ndckpt initrd_root/bin/
+	cp pi/pi initrd_root/bin/
 	cd initrd_root && find ./* | cpio --quiet -H newc -o > ../$@
 	# cpio -itv < $@
 
