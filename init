@@ -6,4 +6,7 @@ echo "Mounting filesystems."
 mount -a
 mkdir /dev/pts
 mount /dev/pts
+
+sysctl -p
+
 exec /sbin/init
