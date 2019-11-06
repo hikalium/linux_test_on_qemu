@@ -5,6 +5,7 @@
 typedef unsigned int size_t;
 int write(int fd, const void*, size_t);
 void exit(int);
+void ndckpt_checkpoint(void);
 
 void printf04d(int v) {
   char s[4];
@@ -53,6 +54,7 @@ void CalcPi() {
     first = 1;
     if ((out_count & 0xff) == 0) write(1, ".", 1);
     result[out_count++] = digit + carry / base;
+    if(out_count % 100 == 0) ndckpt_checkpoint();
   }
 }
 
