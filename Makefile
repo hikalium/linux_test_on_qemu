@@ -36,10 +36,7 @@ initrd.img : initrd.cpio
 initrd.cpio : ndckpt/ndckpt pi/pi .FORCE
 	mkdir -p initrd_root
 	cp -r busybox-1.30.1/_install/* initrd_root/
-	cp init initrd_root/
-	mkdir -p initrd_root/etc
-	cp fstab initrd_root/etc/
-	cp sysctl.conf initrd_root/etc/
+	cp -rv dist/* initrd_root/
 	cp ndckpt/ndckpt initrd_root/bin/
 	cp pi/pi initrd_root/bin/
 	cd initrd_root && find ./* | cpio --quiet -H newc -o > ../$@
