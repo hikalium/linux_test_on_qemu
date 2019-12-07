@@ -1,0 +1,1 @@
+ndckpt restore /bin/pi

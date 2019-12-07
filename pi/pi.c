@@ -54,7 +54,7 @@ void CalcPi() {
     first = 1;
     if ((out_count & 0xff) == 0) write(1, ".", 1);
     result[out_count++] = digit + carry / base;
-    if(out_count % 100 == 0) ndckpt_checkpoint();
+    //if(out_count % 100 == 0) ndckpt_checkpoint();
   }
 }
 
@@ -70,11 +70,12 @@ void Verify() {
 }
 
 int main() {
-  for (int i = 0; ; i++) {
+  for (int i = 0; i < 10; i++) {
     printf04d(i);
     write(1, ": ", 2);
     CalcPi();
     Verify();
+    ndckpt_checkpoint();
   }
   exit(0);
   return 0;
