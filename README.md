@@ -1,7 +1,7 @@
 # linux_test_on_qemu
 
 ```
-sudo apt install build-essential bison flex libelf-dev libssl-dev ccache
+sudo apt install build-essential qemu bison flex libelf-dev libssl-dev ccache
 # Make sure ccache is properly set up
 git clone https://github.com/hikalium/linux_test_on_qemu.git
 cd linux_test_on_qemu
