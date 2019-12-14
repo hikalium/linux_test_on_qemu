@@ -37,10 +37,10 @@ static int LaunchPersistentProcessInBackground(const char *path, char *argv[], i
 
 int main(int argc, char *argv[]) {
   if (argc >= 3 && strcmp(argv[1], "run") == 0) {
-    return LaunchPersistentProcessInBackground(argv[2], &argv[3], 0);
+    return LaunchPersistentProcessInBackground(argv[2], &argv[2], 0);
   }
   if (argc >= 3 && strcmp(argv[1], "restore") == 0) {
-    return LaunchPersistentProcessInBackground(argv[2], &argv[3], 1);
+    return LaunchPersistentProcessInBackground(argv[2], &argv[2], 1);
   }
   puts("ndckpt run <path_to_bin>    # run as persistent process");
   puts("ndckpt restore <path_to_bin>     # restore last persistent process");

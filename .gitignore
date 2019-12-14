@@ -2,3 +2,5 @@ initrd*
 busybox*
 
 *.img
+
+605.mcf_s/

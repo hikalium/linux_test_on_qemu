@@ -95,5 +95,5 @@ format:
 	cd linux-hikalium/drivers/ndckpt && clang-format -i *.c *.h
 
 commit_linux: format
-	cd linux-hikalium && git add . && git diff HEAD --color=always | less -R && git commit
+	cd linux-hikalium && git add . && git diff HEAD --color=always | less -R && git commit && git push
 
