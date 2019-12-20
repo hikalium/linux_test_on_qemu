@@ -1,4 +1,6 @@
 SRCS=pi.c pi.S
 
-pi : $(SRCS) Makefile
-	$(CC) -Wall -Wpedantic -static -nostdlib -emain -o $@ $(SRCS)
+default: pi15000.bin pi30000.bin
+
+pi%.bin : $(SRCS) Makefile
+	$(CC) -Wall -Wpedantic -static -nostdlib -O3 -emain -Ddigits=$* -o $@ $(SRCS)

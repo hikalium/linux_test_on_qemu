@@ -15,8 +15,9 @@ void printf04d(int v) {
   }
   write(1, s, 4);
 }
-
+#ifndef digits
 #define digits 15000
+#endif
 
 #define EXPECT0 3141
 #define EXPECT1 5926
@@ -52,9 +53,11 @@ void CalcPi() {
       carry /= denom;
     }
     first = 1;
-    if ((out_count & 0xff) == 0) write(1, ".", 1);
+    if ((out_count & 0xff) == 0){
+      ndckpt_checkpoint();
+      write(1, ".", 1);
+    }
     result[out_count++] = digit + carry / base;
-    //if(out_count % 100 == 0) ndckpt_checkpoint();
   }
 }
 
@@ -75,7 +78,6 @@ int main() {
     write(1, ": ", 2);
     CalcPi();
     Verify();
-    ndckpt_checkpoint();
   }
   exit(0);
   return 0;
