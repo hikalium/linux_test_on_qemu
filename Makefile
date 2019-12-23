@@ -103,3 +103,12 @@ deploy:
 	cp linux-hikalium/arch/x86_64/boot/bzImage ~/linux-hikalium/hikalium-vmlinux
 	cp initrd.img ~/linux-hikalium/hikalium-initrd.img
 
+install:
+	ssh xopus402 'cp ~/linux-hikalium/* /boot/ && echo OK'
+
+reset:
+	/home4/hikalium/SMCIPMITool_2.22.0_build.190701_bundleJRE_Linux_x64/SMCIPMITool 192.168.4.112 ADMIN ADMIN ipmi power reset
+
+sol:
+	/home4/hikalium/SMCIPMITool_2.22.0_build.190701_bundleJRE_Linux_x64/SMCIPMITool 192.168.4.112 ADMIN ADMIN sol activate
+
