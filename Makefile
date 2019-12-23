@@ -69,11 +69,11 @@ QEMU_ARGS_WITH_GDB = $(QEMU_ARGS_FILE_BACKEND) -s -S
 
 run : initrd.img pmem.img
 	( echo 'change vnc password $(VNC_PASSWORD)' | while ! nc localhost 1240 ; do sleep 1 ; done ) &
-	qemu-system-x86_64 $(QEMU_ARGS_FILE_BACKEND)
-
-run_pmem : initrd.img pmem.img
-	( echo 'change vnc password $(VNC_PASSWORD)' | while ! nc localhost 1240 ; do sleep 1 ; done ) &
 	qemu-system-x86_64 $(QEMU_ARGS_PMEM_BACKEND)
+
+run_dram : initrd.img pmem.img
+	( echo 'change vnc password $(VNC_PASSWORD)' | while ! nc localhost 1240 ; do sleep 1 ; done ) &
+	qemu-system-x86_64 $(QEMU_ARGS_FILE_BACKEND)
 
 run_gdb : initrd.img pmem.img
 	( echo 'change vnc password $(VNC_PASSWORD)' | while ! nc localhost 1240 ; do sleep 1 ; done ) &
