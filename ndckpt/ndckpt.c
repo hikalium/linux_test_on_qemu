@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #define PR_ENABLE_NDCKPT 57
 // int prctl(PR_ENABLE_NDCKPT, 0 or restore object id, 0, 0, 0);
@@ -36,13 +37,21 @@ static int LaunchPersistentProcessInBackground(const char *path, char *argv[], i
 }
 
 int main(int argc, char *argv[]) {
+  if (argc == 2 && strcmp(argv[1], "init") == 0) {
+    return system("if [ -f '/sys/kernel/ndckpt/init' ]; then echo '1' > /sys/kernel/ndckpt/init; fi");
+  }
+  if (argc == 2 && strcmp(argv[1], "info") == 0) {
+    return system("if [ -f '/sys/kernel/ndckpt/info' ]; then cat /sys/kernel/ndckpt/info; fi");
+  }
   if (argc >= 3 && strcmp(argv[1], "run") == 0) {
     return LaunchPersistentProcessInBackground(argv[2], &argv[2], 0);
   }
   if (argc >= 3 && strcmp(argv[1], "restore") == 0) {
     return LaunchPersistentProcessInBackground(argv[2], &argv[2], 1);
   }
-  puts("ndckpt run <path_to_bin>    # run as persistent process");
+  puts("ndckpt init                      # init pmem (This will destroy all data in pmem0!)");
+  puts("ndckpt info                      # show last saved process info");
+  puts("ndckpt run <path_to_bin>         # run as persistent process");
   puts("ndckpt restore <path_to_bin>     # restore last persistent process");
   return 0;
 }
