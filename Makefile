@@ -104,7 +104,10 @@ deploy:
 	cp initrd.img ~/linux-hikalium/hikalium-initrd.img
 
 install:
-	ssh xopus402 'cp ~/linux-hikalium/* /boot/ && echo OK'
+	ssh xopus402 'cp ~/linux-hikalium/* /boot/ && sync && sync && sync && echo OK && sudo reboot'
+
+reboot:
+	ssh xopus402 'sudo reboot'
 
 reset:
 	/home4/hikalium/SMCIPMITool_2.22.0_build.190701_bundleJRE_Linux_x64/SMCIPMITool 192.168.4.112 ADMIN ADMIN ipmi power reset
