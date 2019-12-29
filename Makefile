@@ -104,6 +104,7 @@ deploy:
 	cp initrd.img ~/linux-hikalium/hikalium-initrd.img
 
 install:
+	make deploy
 	ssh xopus402 'cp ~/linux-hikalium/* /boot/ && sync && sync && sync && echo OK && sudo reboot'
 
 reboot:
