@@ -7,3 +7,5 @@ busybox*
 
 __pycache__
 *.swp
+
+*.json
