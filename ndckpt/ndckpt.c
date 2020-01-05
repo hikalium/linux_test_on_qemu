@@ -90,6 +90,7 @@ static int LaunchPersistentProcessInBackground(const char *path, char *argv[],
       continue;
     }
     printf("Parent: unhandled wait done! child status=0x%08X\n", status);
+    exit(EXIT_FAILURE);
   }
   return 0;
 }

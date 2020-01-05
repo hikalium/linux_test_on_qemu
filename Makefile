@@ -39,6 +39,7 @@ initrd.cpio : ndckpt/ndckpt pi .FORCE
 	cp -rv dist/* initrd_root/
 	cp ndckpt/ndckpt initrd_root/bin/
 	cp pi/pi*.bin initrd_root/bin/
+	cp test/*.bin initrd_root/bin/
 	cd initrd_root && find ./* | cpio --quiet -H newc -o > ../$@
 	# cpio -itv < $@
 
