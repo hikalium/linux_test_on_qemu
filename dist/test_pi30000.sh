@@ -1,1 +1,1 @@
-ndckpt run /bin/pi30000.bin
+ndckpt run 100 /bin/pi30000.bin

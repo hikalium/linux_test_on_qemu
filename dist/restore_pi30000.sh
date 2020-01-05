@@ -1,1 +1,1 @@
-ndckpt restore /bin/pi30000.bin
+ndckpt restore 100 /bin/pi30000.bin

@@ -53,9 +53,11 @@ void CalcPi() {
       carry /= denom;
     }
     first = 1;
-    if ((out_count & 0xff) == 0){
-      ndckpt_checkpoint();
+    if ((out_count & 0xff) == 0) {
       write(1, ".", 1);
+#ifdef CALL_NDCKPT_VIA_SYSCALL
+  ndckpt_checkpoint();
+#endif
     }
     result[out_count++] = digit + carry / base;
   }
@@ -68,7 +70,12 @@ void Verify() {
   write(1, " ... ", 5);
   printf04d(result[digits / 4 - 2]);
   printf04d(result[digits / 4 - 1]);
-  write(1, (result[0] == EXPECT0 && result[1] == EXPECT1 && result[digits / 4 - 2] == EXPECT2 && result[digits / 4 - 1] == EXPECT3) ? " OK" : " NG", 3);
+  write(1,
+        (result[0] == EXPECT0 && result[1] == EXPECT1 &&
+         result[digits / 4 - 2] == EXPECT2 && result[digits / 4 - 1] == EXPECT3)
+            ? " OK"
+            : " NG",
+        3);
   write(1, "\n", 1);
 }
 
