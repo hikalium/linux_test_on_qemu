@@ -50,7 +50,7 @@ const run_test = async (target_env, num_of_tries, cmd) => {
 }
 
 async function main() {
-  const target_app = '/bin/pi15000.bin';
+  const target_app = '/bin/pi30000.bin';
   const num_of_tries = 3;
   const target_env = 'real';
   const interval_list = [
@@ -64,11 +64,11 @@ async function main() {
     512,
   ];
   const result_table = [
-    ['date', localISOString(new Date())],
     ['target_app', target_app],
     ['num_of_tries', num_of_tries],
     ['target_env', target_env],
-    ['no_ckpt [s]', await run_test(target_env, num_of_tries, target_app)],
+    ['exec time without ckpt [s]', await run_test(target_env, num_of_tries, target_app)],
+    ['date', localISOString(new Date())],
     [],
     ['ckpt interval [ms]', 'real [s]'],
   ];
