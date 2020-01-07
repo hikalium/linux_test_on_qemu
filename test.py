@@ -60,7 +60,7 @@ def test_pi(p, script_path, num_of_tries):
         this_try = {}
         sanity = []
         while True:
-            idx = p.expect(["OK", "NG", "echo END_OF_TESTRUN", "END_OF_TESTRUN"])
+            idx = p.expect(["OK", "NG", "echo END_OF_TESTRUN", "END_OF_TESTRUN", r"\.\.\."])
             if idx == 3:
                 break
             if idx == 2:
