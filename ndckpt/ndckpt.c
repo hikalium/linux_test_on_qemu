@@ -47,7 +47,8 @@ static void StartCheckpointTimer(int timer_interval_ms) {
 }
 
 static int LaunchPersistentProcessInBackground(const char *path, char *argv[],
-                                               int obj_id, int ckpt_interval_ms) {
+                                               int obj_id,
+                                               int ckpt_interval_ms) {
   target_pid = fork();
   if (target_pid == 0) {
     prctl(PR_SET_PDEATHSIG, SIGTERM);
@@ -66,11 +67,13 @@ static int LaunchPersistentProcessInBackground(const char *path, char *argv[],
     return 1;
   }
   printf("Parent: Forked! child pid= %d\n", target_pid);
-  int err;
-  err = ptrace(PTRACE_SEIZE, target_pid, NULL, 0);
-  printf("Parent: PTRACE_SEIZE: %s\n", err == 0 ? "success" : "FAILED");
-  if (err) exit(EXIT_FAILURE);
-  if(ckpt_interval_ms > 0) StartCheckpointTimer(ckpt_interval_ms);
+  if (ckpt_interval_ms > 0) {
+    int err;
+    err = ptrace(PTRACE_SEIZE, target_pid, NULL, 0);
+    printf("Parent: PTRACE_SEIZE: %s\n", err == 0 ? "success" : "FAILED");
+    if (err) exit(EXIT_FAILURE);
+    StartCheckpointTimer(ckpt_interval_ms);
+  }
   printf("Parent: wait...\n");
   while (1) {
     int status;
@@ -82,9 +85,12 @@ static int LaunchPersistentProcessInBackground(const char *path, char *argv[],
       break;
     }
     if (WIFSTOPPED(status)) {
-      // Stopped by ptrace. Request checkpointing via ptrace.
-      err = ptrace(PTRACE_DO_NDCKPT, target_pid, NULL, 0);
-      if (err) printf("Parent: PTRACE_DO_NDCKPT: FAILED\n");
+      int err;
+      if (WSTOPSIG(status) == SIGTRAP) {
+        // Stopped by ptrace. Request checkpointing via ptrace.
+        err = ptrace(PTRACE_DO_NDCKPT, target_pid, NULL, 0);
+        if (err) printf("Parent: PTRACE_DO_NDCKPT: FAILED\n");
+      }
       err = ptrace(PTRACE_CONT, target_pid, NULL, 0);
       if (err) printf("Parent: PTRACE_CONT: FAILED\n");
       continue;
@@ -107,16 +113,22 @@ int main(int argc, char *argv[]) {
         "/sys/kernel/ndckpt/info; fi");
   }
   if (argc >= 4 && strcmp(argv[1], "run") == 0) {
-    return LaunchPersistentProcessInBackground(argv[3], &argv[3], 0, strtol(argv[2], NULL, 10));
+    return LaunchPersistentProcessInBackground(argv[3], &argv[3], 0,
+                                               strtol(argv[2], NULL, 10));
   }
   if (argc >= 4 && strcmp(argv[1], "restore") == 0) {
-    return LaunchPersistentProcessInBackground(argv[3], &argv[3], 1, strtol(argv[2], NULL, 10));
+    return LaunchPersistentProcessInBackground(argv[3], &argv[3], 1,
+                                               strtol(argv[2], NULL, 10));
   }
   puts(
       "ndckpt init                      # init pmem (This will destroy all "
       "data in pmem0!)");
   puts("ndckpt info                      # show last saved process info");
-  puts("ndckpt run <interval_ms> <path_to_bin>         # run as persistent process");
-  puts("ndckpt restore <interval_ms> <path_to_bin>     # restore last persistent process");
+  puts(
+      "ndckpt run <interval_ms> <path_to_bin>         # run as persistent "
+      "process");
+  puts(
+      "ndckpt restore <interval_ms> <path_to_bin>     # restore last "
+      "persistent process");
   return 0;
 }
