@@ -94,7 +94,8 @@ monitor:
 	telnet localhost $(PORT_MONITOR)
 
 format:
-	cd linux-hikalium/drivers/ndckpt && clang-format -i *.c *.h
+	./format.sh
+	cd linux-hikalium/drivers/ndckpt && clang-format -verbose -i *.c *.h
 
 commit: format
 	git add . && git diff HEAD --color=always | less -R && git commit && git push

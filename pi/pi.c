@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 typedef unsigned int size_t;
-int write(int fd, const void*, size_t);
+int write(int fd, const void *, size_t);
 void exit(int);
 void ndckpt_checkpoint(void);
 
@@ -56,7 +56,7 @@ void CalcPi() {
     if ((out_count & 0xff) == 0) {
       write(1, ".", 1);
 #ifdef CALL_NDCKPT_VIA_SYSCALL
-  ndckpt_checkpoint();
+      ndckpt_checkpoint();
 #endif
     }
     result[out_count++] = digit + carry / base;
