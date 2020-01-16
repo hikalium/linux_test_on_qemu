@@ -66,7 +66,7 @@ QEMU_ARGS_PMEM_BACKEND = \
 			$(QEMU_ARGS) \
 			-object memory-backend-file,id=mem1,share=on,mem-path=/mnt/pmem0_ext4/pmem.img,size=2G
 
-QEMU_ARGS_WITH_GDB = $(QEMU_ARGS_FILE_BACKEND) -s -S
+QEMU_ARGS_WITH_GDB = $(QEMU_ARGS_PMEM_BACKEND) -s -S
 
 run : initrd.img pmem.img
 	( echo 'change vnc password $(VNC_PASSWORD)' | while ! nc localhost 1240 ; do sleep 1 ; done ) &
@@ -95,6 +95,9 @@ monitor:
 
 format:
 	cd linux-hikalium/drivers/ndckpt && clang-format -i *.c *.h
+
+commit: format
+	git add . && git diff HEAD --color=always | less -R && git commit && git push
 
 commit_linux: format
 	cd linux-hikalium && git add . && git diff HEAD --color=always | less -R && git commit && git push
