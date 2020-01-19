@@ -23,6 +23,9 @@ modules : .FORCE
 pmem.img :
 	qemu-img create $@ 2G
 
+/mnt/pmem0_ext4/pmem.img :
+	qemu-img create $@ 16G
+
 
 ndckpt/ndckpt : .FORCE
 	make -C ndckpt ndckpt
@@ -68,7 +71,7 @@ QEMU_ARGS_PMEM_BACKEND = \
 
 QEMU_ARGS_WITH_GDB = $(QEMU_ARGS_PMEM_BACKEND) -s -S
 
-run : initrd.img pmem.img
+run : initrd.img /mnt/pmem0_ext4/pmem.img
 	( echo 'change vnc password $(VNC_PASSWORD)' | while ! nc localhost 1240 ; do sleep 1 ; done ) &
 	qemu-system-x86_64 $(QEMU_ARGS_PMEM_BACKEND)
 
@@ -76,7 +79,7 @@ run_dram : initrd.img pmem.img
 	( echo 'change vnc password $(VNC_PASSWORD)' | while ! nc localhost 1240 ; do sleep 1 ; done ) &
 	qemu-system-x86_64 $(QEMU_ARGS_FILE_BACKEND)
 
-run_gdb : initrd.img pmem.img
+run_gdb : initrd.img /mnt/pmem0_ext4/pmem.img
 	( echo 'change vnc password $(VNC_PASSWORD)' | while ! nc localhost 1240 ; do sleep 1 ; done ) &
 	qemu-system-x86_64 $(QEMU_ARGS_WITH_GDB)
 
