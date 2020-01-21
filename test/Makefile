@@ -1,4 +1,4 @@
-default: test_reg.bin bss_write.bin hello_libc_static.bin nop_libc_static.bin mmap.bin data_with_init.bin
+default: test_reg.bin test_fpu.bin bss_write.bin hello_libc_static.bin nop_libc_static.bin mmap.bin data_with_init.bin
 
 %.bin : %.S Makefile
 	$(CC) -Wall -Wpedantic -static -nostdlib -O3 -emain -o $@ $*.S
