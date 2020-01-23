@@ -68,7 +68,7 @@ def test_pi(p, script_path, num_of_tries):
             print(p.after.decode("utf-8"), end = "", flush=True, file=sys.stderr);
             sanity.append(p.after.decode("utf-8"))
         print("exited", file=sys.stderr, flush=True, end="") 
-        this_try['sanity'] = sanity;
+        #this_try['sanity'] = sanity;
         real_sum = real_sum + read_time(this_try, 'real');
         user_sum = user_sum + read_time(this_try, 'user');
         sys_sum = sys_sum + read_time(this_try, 'sys');

@@ -4,6 +4,7 @@ busybox*
 *.img
 
 605.mcf_s/
+657.xz_s/
 
 __pycache__
 *.swp

@@ -21,7 +21,7 @@ modules : .FORCE
 	make -j11 INSTALL_MOD_PATH=`readlink -f initrd_root` -C linux-hikalium modules_install
 
 pmem.img :
-	qemu-img create $@ 2G
+	qemu-img create $@ 16G
 
 /mnt/pmem0_ext4/pmem.img :
 	qemu-img create $@ 16G
@@ -55,7 +55,7 @@ QEMU_ARGS = \
 			-machine q35,nvdimm -cpu host --enable-kvm -smp 4 \
 			-monitor stdio \
 			-monitor telnet:127.0.0.1:$(PORT_MONITOR),server,nowait \
-			-m 8G,slots=2,maxmem=10G \
+			-m 8G,slots=2,maxmem=24G \
 			-device nvdimm,id=nvdimm1,memdev=mem1 \
 			-serial tcp::$(PORT_SERIAL),server,nowait \
 			-vnc :0,password \
@@ -63,11 +63,11 @@ QEMU_ARGS = \
 
 QEMU_ARGS_FILE_BACKEND = \
 			$(QEMU_ARGS) \
-			-object memory-backend-file,id=mem1,share=on,mem-path=pmem.img,size=2G
+			-object memory-backend-file,id=mem1,share=on,mem-path=pmem.img,size=16G
 
 QEMU_ARGS_PMEM_BACKEND = \
 			$(QEMU_ARGS) \
-			-object memory-backend-file,id=mem1,share=on,mem-path=/mnt/pmem0_ext4/pmem.img,size=2G
+			-object memory-backend-file,id=mem1,share=on,mem-path=/mnt/pmem0_ext4/pmem.img,size=16G
 
 QEMU_ARGS_WITH_GDB = $(QEMU_ARGS_PMEM_BACKEND) -s -S
 

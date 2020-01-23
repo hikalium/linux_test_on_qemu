@@ -51,14 +51,11 @@ const run_test = async (target_env, num_of_tries, cmd) => {
 
 async function main() {
   const target_app = '/bin/pi15000.bin';
-  const num_of_tries = 3;
-  const target_env = 'real';
+  const num_of_tries = 1;
+  const target_env = 'qemu';
   const interval_list = [
-    1,
-    2,
-    4,
-    8,
-    16,
+    0,
+    5000,
   ];
   /*
   const interval_list = [
