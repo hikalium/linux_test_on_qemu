@@ -50,6 +50,9 @@ static void StartCheckpointTimer(int timer_interval_ms) {
 static int LaunchPersistentProcessInBackground(const char *path, char *argv[],
                                                int obj_id,
                                                int ckpt_interval_ms) {
+  int ckpt_count = 0;
+  int ckpt_log_time_remain = 0;
+  const int ckpt_log_time_ms = 5 * 1000;
   target_pid = fork();
   if (target_pid == 0) {
     prctl(PR_SET_PDEATHSIG, SIGTERM);
@@ -82,8 +85,10 @@ static int LaunchPersistentProcessInBackground(const char *path, char *argv[],
     pid_t wait_pid = waitpid(target_pid, &status, WUNTRACED);
     if (WIFEXITED(status)) {
       int retv = WEXITSTATUS(status);
-      printf("Parent: child exited! child pid=%d, child retv=%d\n", wait_pid,
-             retv);
+      printf("\nNDCKPT_CHILD_EXITED\n");
+      printf("child_pid: %d\n", wait_pid);
+      printf("child_retv: %d\n", retv);
+      printf("num_of_ckpt_via_ptrace: %d\n", ckpt_count);
       break;
     }
     if (WIFSTOPPED(status)) {
@@ -93,6 +98,14 @@ static int LaunchPersistentProcessInBackground(const char *path, char *argv[],
         err = ptrace(PTRACE_DO_NDCKPT, target_pid, NULL, 0);
         if (err)
           printf("Parent: PTRACE_DO_NDCKPT: FAILED\n");
+        else {
+          ckpt_count++;
+          ckpt_log_time_remain -= ckpt_interval_ms;
+          if (ckpt_log_time_remain < 0) {
+            printf("\nParent: Checkpoint #%d\n", ckpt_count);
+            ckpt_log_time_remain = ckpt_log_time_ms;
+          }
+        }
       }
       err = ptrace(PTRACE_CONT, target_pid, NULL, 0);
       if (err)

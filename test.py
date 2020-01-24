@@ -35,6 +35,24 @@ def read_time(dst, type_str):
     dst[type_str] = (parsed[0] * 60 + parsed[1]);
     return dst[type_str]
 
+def read_int(dst, type_str):
+    p.expect(type_str + r': \d+')
+    s = p.after.decode("utf-8");
+    print(s, file=sys.stderr, flush=True, end='');
+    parsed = parse.parse(type_str + ': {:d}', s);
+    dst[type_str] = parsed[0];
+    return dst[type_str]
+
+def removeControlCharacter(s):
+    ret = ''
+    for c in s:
+        ord_num = ord(c)
+        #制御文字
+        if(ord_num <= 31):
+            continue;
+        ret += c
+    return ret
+
 def test_pi(p, script_path, num_of_tries):
     result = {
         'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -46,6 +64,7 @@ def test_pi(p, script_path, num_of_tries):
     real_sum = 0
     user_sum = 0
     sys_sum = 0
+    num_of_ckpt_via_ptrace_sum = 0
     for i in range(num_of_tries):
         marker = str(int(time.time()));
         p.sendline("");
@@ -54,21 +73,21 @@ def test_pi(p, script_path, num_of_tries):
         print('Marker found', file=sys.stderr, flush=True, end="")
         p.expect('\r\n')
 
-        cmd = "time sh -c '" + script_path + " && echo END_OF_TESTRUN'";
+        cmd = "ndckpt init && time sh -c '" + script_path + " && end_of=END_OF_ && test_run=TESTRUN && echo ${end_of}${test_run}'";
         p.sendline(cmd)
         print("process launched: " + cmd, file=sys.stderr, flush=True, end="");
         this_try = {}
-        sanity = []
         while True:
-            idx = p.expect(["OK", "NG", "echo END_OF_TESTRUN", "END_OF_TESTRUN", r"\.\.\."])
-            if idx == 3:
+            idx = p.expect(["END_OF_TESTRUN", "NDCKPT_CHILD_EXITED", r"\r\n"], timeout=60*30)
+            if idx == 0:
                 break
-            if idx == 2:
-                continue
-            print(p.after.decode("utf-8"), end = "", flush=True, file=sys.stderr);
-            sanity.append(p.after.decode("utf-8"))
+            if idx == 1:
+                read_int(this_try, 'child_pid');
+                read_int(this_try, 'child_retv');
+                num_of_ckpt_via_ptrace_sum += read_int(this_try, 'num_of_ckpt_via_ptrace');
+                break
+            print(removeControlCharacter(p.before.decode("utf-8")), end = "", flush=True, file=sys.stderr);
         print("exited", file=sys.stderr, flush=True, end="") 
-        #this_try['sanity'] = sanity;
         real_sum = real_sum + read_time(this_try, 'real');
         user_sum = user_sum + read_time(this_try, 'user');
         sys_sum = sys_sum + read_time(this_try, 'sys');
@@ -78,6 +97,7 @@ def test_pi(p, script_path, num_of_tries):
     result['real_ave'] = real_sum / num_of_tries;
     result['user_ave'] = user_sum / num_of_tries;
     result['sys_ave'] = sys_sum / num_of_tries;
+    result['num_of_ckpt_via_ptrace_ave'] = num_of_ckpt_via_ptrace_sum / num_of_tries;
 
     print(json.dumps(result, indent=2))
     print("done\n", file=sys.stderr, flush=True, end="") 
