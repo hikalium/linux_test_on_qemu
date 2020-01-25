@@ -84,18 +84,37 @@ async function measure_app(
 async function
 main() {
   const num_of_tries = 3;
-  const target_env = 'qemu';
+  const target_env = 'real';
   const interval_list = [
     -1,
+    1*1000,
+    5*1000,
+    10*1000,
+    50*1000,
     0,
   ];
   const app_list = [
+    {
+      name: 'pi_15000',
+      cmd:
+          'bin/pi15000.bin',
+    },
+    {
+      name: 'pi_30000',
+      cmd:
+          'bin/pi30000.bin',
+    },
+    /*
+    {
+      name: 'xz_s_ref_cld_16',
+      cmd:
+          '657.xz_s/xz_s 657.xz_s/cld.tar.xz 16 19cf30ae51eddcbefda78dd06014b4b96281456e078ca7c13e1c0c9e6aaea8dff3efb4ad6b0456697718cede6bd5454852652806a657bb56e07d61128434b474 536995164 539938872 8',
+    },
     {
       name: 'xz_s_ref_cld_8',
       cmd:
           '657.xz_s/xz_s 657.xz_s/cld.tar.xz 8 19cf30ae51eddcbefda78dd06014b4b96281456e078ca7c13e1c0c9e6aaea8dff3efb4ad6b0456697718cede6bd5454852652806a657bb56e07d61128434b474 536995164 539938872 8',
     },
-    /*
     {
       name: 'xz_s_ref_cld_32',
       cmd:
@@ -107,11 +126,6 @@ main() {
           '657.xz_s/xz_s 657.xz_s/cld.tar.xz 64 19cf30ae51eddcbefda78dd06014b4b96281456e078ca7c13e1c0c9e6aaea8dff3efb4ad6b0456697718cede6bd5454852652806a657bb56e07d61128434b474 536995164 539938872 8',
     },
     {
-      name: 'pi_15000',
-      cmd:
-          'bin/pi15000.bin',
-    },
-    {
       name: 'xz_s_ref_docs',
       cmd:
           '657.xz_s/xz_s 657.xz_s/cpu2006docs.tar.xz 6643 055ce243071129412e9dd0b3b69a21654033a9b723d874b2015c774fac1553d9713be561ca86f74e4f16f22e664fc17a79f30caa5ad2c04fbc447549c2810fae 1036078272 1111795472 4',
@@ -120,11 +134,6 @@ main() {
       name: 'xz_s_ref_cld_32',
       cmd:
           '657.xz_s/xz_s 657.xz_s/cld.tar.xz 32 19cf30ae51eddcbefda78dd06014b4b96281456e078ca7c13e1c0c9e6aaea8dff3efb4ad6b0456697718cede6bd5454852652806a657bb56e07d61128434b474 536995164 539938872 8',
-    },
-    {
-      name: 'pi_30000',
-      cmd:
-          'bin/pi30000.bin',
     },
     {
       name: 'xz_s_ref_cld_8',

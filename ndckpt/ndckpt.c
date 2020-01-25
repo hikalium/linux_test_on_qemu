@@ -90,8 +90,7 @@ static int LaunchPersistentProcessInBackground(const char *path, char *argv[],
       printf("child_retv: %d\n", retv);
       printf("num_of_ckpt_via_ptrace: %d\n", ckpt_count);
       break;
-    }
-    if (WIFSTOPPED(status)) {
+    } else if (WIFSTOPPED(status)) {
       int err;
       if (WSTOPSIG(status) == SIGTRAP) {
         // Stopped by ptrace. Request checkpointing via ptrace.
@@ -106,6 +105,15 @@ static int LaunchPersistentProcessInBackground(const char *path, char *argv[],
             ckpt_log_time_remain = ckpt_log_time_ms;
           }
         }
+      } else {
+        printf("Parent: not SIGTRAP but STOPPED. SIGNAL=%d\n",
+               WSTOPSIG(status));
+        err = ptrace(PTRACE_DETACH, target_pid, NULL, 0);
+        if (err)
+          printf("Parent: PTRACE_DETACH: FAILED\n");
+        printf("\nNDCKPT_CHILD_SIGNALED\n");
+        printf("signal: %d\n", WSTOPSIG(status));
+        exit(EXIT_FAILURE);
       }
       err = ptrace(PTRACE_CONT, target_pid, NULL, 0);
       if (err)
