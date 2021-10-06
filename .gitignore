@@ -2,6 +2,7 @@ initrd*
 busybox*
 
 *.img
+*.ext4
 
 605.mcf_s/
 657.xz_s/

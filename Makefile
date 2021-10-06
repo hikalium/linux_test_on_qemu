@@ -7,14 +7,16 @@ default: bzImage initrd.img
 
 .FORCE : 
 
+BUSYBOX=busybox-1.34.1
+
 busybox : .FORCE
-	wget https://busybox.net/downloads/busybox-1.30.1.tar.bz2
-	tar -xvf busybox-1.30.1.tar.bz2
-	cd busybox-1.30.1 && make defconfig && make CONFIG_STATIC=y install -j8
+	wget https://busybox.net/downloads/${BUSYBOX}.tar.bz2
+	tar -xvf ${BUSYBOX}.tar.bz2
+	cd ${BUSYBOX} && make defconfig && make CONFIG_STATIC=y install -j8
 
 bzImage : .FORCE
 	cp kernel_config_v5.1.8.txt linux-hikalium/.config
-	export CCACHE_DIR=/home/hikalium/.ccache && time make -C linux-hikalium CC="ccache gcc" -j11
+	make -C linux-hikalium -j11
 
 modules : .FORCE
 	make -j11 -C linux-hikalium modules
@@ -33,18 +35,27 @@ ndckpt/ndckpt : .FORCE
 pi : .FORCE
 	make -C pi
 
-initrd.img : initrd.cpio
-	cat initrd.cpio | gzip > $@
-
-initrd.cpio : ndckpt/ndckpt pi .FORCE
+root_files : ndckpt/ndckpt pi .FORCE
 	mkdir -p initrd_root
-	cp -r busybox-1.30.1/_install/* initrd_root/
+	cp -r ${BUSYBOX}/_install/* initrd_root/
 	cp -rv dist/* initrd_root/
 	cp ndckpt/ndckpt initrd_root/bin/
 	cp pi/pi*.bin initrd_root/bin/
-	cp test/*.bin initrd_root/bin/
+	-cp test/*.bin initrd_root/bin/
+
+root.ext4 : root_files
+	truncate -s 8M root.ext4
+	mkfs.ext4 -F root.ext4
+	mkdir -p mnt
+	sudo mount root.ext4 mnt
+	sudo cp -r initrd_root/* mnt/
+	sudo umount mnt
+
+initrd.img : initrd.cpio
+	cat initrd.cpio | gzip > $@
+
+initrd.cpio : root_files
 	cd initrd_root && find ./* | cpio --quiet -H newc -o > ../$@
-	# cpio -itv < $@
 
 BZIMAGE_PATH=linux-hikalium/arch/x86_64/boot/bzImage
 QEMU_ARGS = \
