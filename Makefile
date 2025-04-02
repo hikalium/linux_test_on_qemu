@@ -135,3 +135,5 @@ reset:
 sol:
 	/home4/hikalium/SMCIPMITool_2.22.0_build.190701_bundleJRE_Linux_x64/SMCIPMITool 192.168.4.112 ADMIN ADMIN sol activate
 
+setup:
+	cd linux-hikalium && git remote -v | grep upstream || git remote add upstream https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
